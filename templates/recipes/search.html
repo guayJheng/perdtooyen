@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ค้นหา{% if query %} "{{ query }}"{% endif %} — เปิดตู้เย็น (PerdTooYen){% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+  <div class="container">
+    <h1 class="page-header-title"><i class="bi bi-search me-2"></i>ค้นหาเมนู</h1>
+  </div>
+</section>
+
+<section class="list-section">
+  <div class="container">
+
+    <!-- Search form -->
+    <form method="GET" action="{% url 'recipes:search' %}" class="mb-5">
+      <div class="search-hero-group">
+        <input type="text" name="q" class="search-hero-input" id="searchInput"
+               value="{{ query }}" placeholder="ชื่อเมนู หรือ วัตถุดิบ เช่น ข้าวผัด, กระเทียม..."
+               autofocus autocomplete="off" />
+        <button type="submit" class="btn btn-primary search-hero-btn">
+          <i class="bi bi-search me-1"></i>ค้นหา
+        </button>
+      </div>
+    </form>
+
+    {% if query %}
+      <p class="text-muted mb-4">
+        ผลการค้นหา "<strong>{{ query }}</strong>" — พบ {{ total }} เมนู
+      </p>
+
+      {% if recipes %}
+      <div class="row g-4">
+        {% for recipe in recipes %}
+        <div class="col-sm-6 col-lg-4">
+          <a href="{% url 'recipes:detail' recipe.id %}" class="recipe-card-link">
+            <article class="recipe-card h-100">
+              <div class="recipe-card-img-wrap">
+                {% if recipe.image %}
+                  <img src="{{ recipe.image.url }}" alt="{{ recipe.name }}" class="recipe-card-img" loading="lazy" />
+                {% else %}
+                  <div class="recipe-card-placeholder">{{ recipe.get_cooking_method_emoji }}</div>
+                {% endif %}
+                <div class="recipe-card-badges">
+                  <span class="badge-time"><i class="bi bi-clock"></i> {{ recipe.cooking_time }} นาที</span>
+                  {% if recipe.is_spicy %}<span class="badge-spicy">🌶️</span>{% endif %}
+                </div>
+              </div>
+              <div class="recipe-card-body">
+                <h2 class="recipe-card-title">{{ recipe.name }}</h2>
+                <p class="recipe-card-desc">{{ recipe.description|truncatechars:70 }}</p>
+              </div>
+              <div class="recipe-card-footer">
+                <span class="difficulty-badge difficulty-{{ recipe.difficulty }}">{{ recipe.get_difficulty_display }}</span>
+                <span class="view-link">ดูวิธีทำ <i class="bi bi-arrow-right"></i></span>
+              </div>
+            </article>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+
+      {% else %}
+      <div class="empty-state text-center py-5">
+        <div class="empty-icon">🔍</div>
+        <h3 class="mt-3">ไม่พบเมนูที่ตรงกับ "{{ query }}"</h3>
+        <p class="text-muted">ลองค้นหาด้วยคำอื่น หรือดูเมนูทั้งหมด</p>
+        <a href="{% url 'recipes:list' %}" class="btn btn-primary mt-2">ดูเมนูทั้งหมด</a>
+      </div>
+      {% endif %}
+
+    {% else %}
+    <div class="text-center py-5 text-muted">
+      <i class="bi bi-search fs-1 d-block mb-3"></i>
+      <p>พิมพ์ชื่อเมนูหรือวัตถุดิบในช่องค้นหา</p>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

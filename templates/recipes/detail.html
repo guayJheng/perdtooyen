@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ recipe.name }} — เปิดตู้เย็น (PerdTooYen){% endblock %}
+{% block meta_description %}{{ recipe.description|truncatechars:150 }}{% endblock %}
+
+{% block content %}
+
+<!-- ===== HERO IMAGE ===== -->
+<section class="detail-hero">
+  {% if recipe.image %}
+    <div class="detail-hero-img" style="background-image:url('{{ recipe.image.url }}')"></div>
+  {% else %}
+    <div class="detail-hero-placeholder">{{ recipe.get_cooking_method_emoji }}</div>
+  {% endif %}
+  <div class="detail-hero-overlay">
+    <div class="container detail-hero-content">
+      <a href="javascript:history.back()" class="btn btn-back-white mb-3">
+        <i class="bi bi-arrow-left me-1"></i>กลับ
+      </a>
+      <div class="detail-badges mb-2">
+        <span class="badge-category">{{ recipe.get_category_display }}</span>
+        <span class="badge-method">{{ recipe.get_cooking_method_display }}</span>
+        {% if recipe.is_spicy %}<span class="badge-spicy-lg">🌶️ เผ็ด</span>{% endif %}
+      </div>
+      <h1 class="detail-title">{{ recipe.name }}</h1>
+      <div class="detail-stats">
+        <div class="stat-item">
+          <i class="bi bi-clock"></i>
+          <span>{{ recipe.cooking_time }} นาที</span>
+        </div>
+        <div class="stat-item">
+          <i class="bi bi-bar-chart"></i>
+          <span>{{ recipe.get_difficulty_display }}</span>
+        </div>
+        {% if recipe.calories %}
+        <div class="stat-item">
+          <i class="bi bi-fire"></i>
+          <span>{{ recipe.calories }} kcal</span>
+        </div>
+        {% endif %}
+        <div class="stat-item">
+          <i class="bi bi-basket"></i>
+          <span>{{ recipe.recipe_ingredients.count }} วัตถุดิบ</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DESCRIPTION ===== -->
+{% if recipe.description %}
+<div class="container mt-4">
+  <p class="detail-description">{{ recipe.description }}</p>
+</div>
+{% endif %}
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="container detail-content-wrap">
+  <div class="row g-4">
+
+    <!-- LEFT: Ingredients -->
+    <div class="col-lg-4">
+      <div class="detail-card">
+        <h2 class="detail-card-title">
+          <i class="bi bi-basket2 me-2"></i>วัตถุดิบ
+        </h2>
+
+        {% if has_session %}
+        <div class="session-note">
+          <i class="bi bi-info-circle me-1"></i>
+          แสดงตามวัตถุดิบที่คุณเลือกไว้
+        </div>
+        {% endif %}
+
+        <ul class="ingredient-list">
+          {% for item in ingredient_status %}
+          <li class="ingredient-item {% if has_session %}{% if item.has_it %}has{% else %}missing{% endif %}{% endif %}">
+            <div class="ingredient-item-left">
+              {% if has_session %}
+                {% if item.has_it %}
+                  <span class="ing-status has"><i class="bi bi-check-circle-fill"></i></span>
+                {% else %}
+                  <span class="ing-status missing"><i class="bi bi-x-circle-fill"></i></span>
+                {% endif %}
+              {% else %}
+                <span class="ing-dot"></span>
+              {% endif %}
+              <span class="ing-name">{{ item.recipe_ingredient.ingredient.name }}</span>
+              {% if not item.recipe_ingredient.is_required %}
+                <span class="ing-optional">(optional)</span>
+              {% endif %}
+            </div>
+            <span class="ing-qty">{{ item.recipe_ingredient.quantity }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+
+        {% if has_session %}
+        <div class="mt-3">
+        </div>
+        {% endif %}
+
+        <div class="mt-4 text-center">
+          <a href="{% url 'recommendations:home' %}" class="btn btn-outline-primary w-100">
+            <i class="bi bi-arrow-left-circle me-2"></i>เลือกวัตถุดิบใหม่
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Steps -->
+    <div class="col-lg-8">
+      <div class="detail-card">
+        <h2 class="detail-card-title">
+          <i class="bi bi-list-ol me-2"></i>ขั้นตอนการทำ
+        </h2>
+
+        {% if steps %}
+        <ol class="step-list">
+          {% for step in steps %}
+          <li class="step-item">
+            <div class="step-number">{{ step.step_number }}</div>
+            <div class="step-content">
+              <p class="step-text">{{ step.instruction }}</p>
+              {% if step.image %}
+              <img src="{{ step.image.url }}" alt="ขั้นตอน {{ step.step_number }}"
+                   class="step-img img-fluid rounded-3 mt-2" />
+              {% endif %}
+            </div>
+          </li>
+          {% endfor %}
+        </ol>
+        {% else %}
+        <p class="text-muted text-center py-4">
+          <i class="bi bi-journal-x fs-3 d-block mb-2"></i>ยังไม่มีขั้นตอนการทำ
+        </p>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="container pb-5 text-center mt-4">
+  <a href="{% url 'recommendations:home' %}" class="btn btn-primary btn-lg me-2">
+    <i class="bi bi-house me-2"></i>กลับหน้าหลัก
+  </a>
+  <a href="{% url 'recipes:list' %}" class="btn btn-outline-secondary btn-lg">
+    <i class="bi bi-grid me-2"></i>เมนูทั้งหมด
+  </a>
+</div>
+
+{% endblock %}
