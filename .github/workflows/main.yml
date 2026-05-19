@@ -18,14 +18,11 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+      - name: Make build script executable
+        run: chmod +x build.sh
 
-      - name: Run migrations
-        run: |
-          python manage.py migrate
+      - name: Run build script
+        run: ./build.sh
 
       - name: Run tests
-        run: |
-          python manage.py test
+        run: python manage.py test
