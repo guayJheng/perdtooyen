@@ -18,7 +18,7 @@ sys.path.insert(0, str(BASE_DIR / 'apps'))
 # --------------------------------------------------------------------------- #
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-change-in-production')
 DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = ["https://perdtooyen.onrender.com/"]
+ALLOWED_HOSTS = ["https://perdtooyen.onrender.com"]
 
 # --------------------------------------------------------------------------- #
 #  Application definition
